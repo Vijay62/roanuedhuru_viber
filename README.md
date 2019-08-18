@@ -6,20 +6,9 @@ This is a beta version of viber bot which has been done at the basis of roaneudh
 ```
 apt install python3.7 -y && apt install python3-pip
 ```
-### Viber-API:
+### Install the PyPI packages with requirements.text:
 ```
-pip3 install viberbot
-```
-
-### Flask:
-```
-pip3 install flask
-```
-
-### BeautifulSoup:
-```
-pip3 install BeautifulSoup4
-pip install lxml
+pip3 install -r requirements.txt
 ```
 
 ### Apache2
@@ -47,5 +36,15 @@ sudo certbot --apache -d your_domain -d www.your_domain
 # To test the renewal process, you can do a dry run with certbot
 
 sudo certbot renew --dry-run
+```
+
+## Deploying the bot and running the session:
+
+```
+#clone the repository and browse to the directory <roanuedhuru_userbot>
+#install tmux, create the session, run the  bot
+apt instlal tmux
+tmux new -s roanuedhuru
+python3 main.py
 ```
 
