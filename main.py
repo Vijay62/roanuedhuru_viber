@@ -73,18 +73,22 @@ def incoming():
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard)])
             
             elif command == "sun.mv":
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from sun.mv:")])
                 sun_rich_media = Property.create_richmedia(News.sun())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= sun_rich_media, min_api_version=6)])
             
             elif command == "rajje.mv":
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from rajje.mv:")])
                 rajje_rich_media = Property.create_richmedia(News.raajje())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= rajje_rich_media, min_api_version=6)])
 
             elif command == "vaguthu.mv":
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from vaguthu.mv:")])
                 vaguthu_rich_media = Property.create_richmedia(News.vaguthu())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vaguthu_rich_media, min_api_version=6)])
   
             elif command == "mihaaru.mv":
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from mihaaru.mv:")])
                 mihaaru_rich_media = Property.create_richmedia(News.mihaaru())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= mihaaru_rich_media, min_api_version=6)])
         
@@ -100,11 +104,11 @@ def incoming():
     return Response(status=200)
 
 def create_webhook(viber, webhookURL):
-    viber.set_webhook("https://daisy.eyaadh.net:8989")
+    viber.set_webhook("https://daisy.eyaadh.net:3408")
 
 
 if __name__ == "__main__":    
-    #viber.set_webhook("")
+    viber.set_webhook("")
     time.sleep(1)
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(5, 1, create_webhook, (viber, "https://daisy.eyaadh.net:5050",))
@@ -112,4 +116,4 @@ if __name__ == "__main__":
     t.start()
 
     context = ('/etc/letsencrypt/live/daisy.eyaadh.net/fullchain.pem', '/etc/letsencrypt/live/daisy.eyaadh.net/privkey.pem')
-    app.run(host='0.0.0.0', port=8989, debug=True, ssl_context=context)
+    app.run(host='0.0.0.0', port=3408, debug=True, ssl_context=context)
