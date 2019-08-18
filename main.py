@@ -67,7 +67,7 @@ def incoming():
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard)])
                 
             elif command == "mvnews":
-                menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.mv','Mihaaru.mv'],['start','Back']]
+                menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
                 mvnews_keyboard = Property.create_menu(menu_button_list)
 
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard)])
@@ -87,7 +87,7 @@ def incoming():
                 vaguthu_rich_media = Property.create_richmedia(News.vaguthu())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vaguthu_rich_media, min_api_version=6)])
   
-            elif command == "mihaaru.mv":
+            elif command == "mihaaru.com":
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from mihaaru.mv:")])
                 mihaaru_rich_media = Property.create_richmedia(News.mihaaru())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= mihaaru_rich_media, min_api_version=6)])
