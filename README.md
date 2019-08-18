@@ -6,7 +6,7 @@ This is a beta version of viber bot which has been done at the basis of roaneudh
 ```
 apt install python3.7 -y && apt install python3-pip
 ```
-### Install the PyPI packages with requirements.text:
+### Install the PyPI packages with requirements.txt:
 ```
 pip3 install -r requirements.txt
 ```
@@ -41,7 +41,7 @@ sudo certbot renew --dry-run
 ## Deploying the bot and running the session:
 
 ```
-#clone the repository and browse to the directory <roanuedhuru_userbot>
+#clone the repository and browse to the directory <roanuedhuru_viber>
 #install tmux, create the session, run the  bot
 apt instlal tmux
 tmux new -s roanuedhuru
