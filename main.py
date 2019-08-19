@@ -22,6 +22,7 @@ import logging
 import sched
 import threading
 import tldextract
+import re
 
 
 logger = logging.getLogger()
@@ -57,39 +58,40 @@ def incoming():
 
         if token != last_token:
             last_token = token
-            if command == "start" or command == "menu":
+            
+            if re.match(command, "start", re.IGNORECASE) or re.match(command, "menu", re.IGNORECASE):
                 menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcments'],['yt_audio','Youtube to Audio']]
                 default_keyboard = Property.create_menu(menu_button_list)
 
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard)])
                 
-            elif command == "mvnews":
+            elif re.match(command, "mvnews", re.IGNORECASE):
                 menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
                 mvnews_keyboard = Property.create_menu(menu_button_list)
 
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard)])
             
-            elif command == "sun.mv":
+            elif re.match(command, "sun.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from sun.mv:")])
                 sun_rich_media = Property.create_richmedia(News.sun())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= sun_rich_media, min_api_version=6)])
             
-            elif command == "rajje.mv":
+            elif re.match(command, "rajje.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from rajje.mv:")])
                 rajje_rich_media = Property.create_richmedia(News.raajje())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= rajje_rich_media, min_api_version=6)])
 
-            elif command == "vaguthu.mv":
+            elif re.match(command, "vaguthu.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from vaguthu.mv:")])
                 vaguthu_rich_media = Property.create_richmedia(News.vaguthu())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vaguthu_rich_media, min_api_version=6)])
   
-            elif command == "mihaaru.com":
+            elif re.match(command, "mihaaru.com", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from mihaaru.mv:")])
                 mihaaru_rich_media = Property.create_richmedia(News.mihaaru())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= mihaaru_rich_media, min_api_version=6)])
 
-            elif command == "yt_audio":
+            elif re.match(command, "yt_audio", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the YouTube Link that you would like to convert to Audio", tracking_data="yt_audio")])
         
         if message.tracking_data == "yt_audio" and viber_request.sender.name is not "roanuedhuru":
@@ -114,10 +116,7 @@ def incoming():
                     viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Link (eyeroll), Kindly resend me the command yt_audio and send me a proper YouTube link to convert it to Audio.", tracking_data=None)])
     
     if isinstance(viber_request, ViberConversationStartedRequest) :
-        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start to begin with.".format(viber_request.user.name))])
-
-        
-
+        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start or Menu to begin with.".format(viber_request.user.name))])
 
     elif isinstance(viber_request, ViberFailedRequest):
         logger.warn("client failed receiving message. failure: {0}".format(viber_request))
