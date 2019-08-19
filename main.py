@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from flask import Flask, request, Response
 from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
@@ -16,17 +15,13 @@ from bs4 import SoupStrainer
 from urllib.request import Request, urlopen
 from utils.mvnews import News
 from utils.properties import Property
+from utils.ytdl import ytdl
 
 import time
 import logging
 import sched
 import threading
-import os
-import binascii
 import tldextract
-import shutil
-import urllib.parse
-import youtube_dl
 
 
 logger = logging.getLogger()
@@ -63,7 +58,7 @@ def incoming():
         if token != last_token:
             last_token = token
             if command == "start" or command == "menu":
-                menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcments']]
+                menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcments'],['yt_audio','Youtube to Audio']]
                 default_keyboard = Property.create_menu(menu_button_list)
 
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard)])
@@ -100,39 +95,23 @@ def incoming():
         if message.tracking_data == "yt_audio" and viber_request.sender.name is not "roanuedhuru":
             if token != last_token_track:
                 last_token_track = token
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Allow me to convert it to Audio and come back to you with the Audio file.", tracking_data=None)])
+                
+                domain = tldextract.extract(message.text)
+                if domain.domain == 'youtube' or domain.domain == 'youtu':
+                    viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Allow me to convert it and come back to you with an Audio File. (yo)", tracking_data=None)])
+                    ytdl_data = ytdl.ytdl_audio(message.text)
 
-                sub_directory=binascii.b2a_hex(os.urandom(4)).decode('utf-8')
+                    if ytdl_data is not False:
+                        file_size = ytdl_data[0]
+                        media_link = ytdl_data[1]
+                        file_name = ytdl_data[2]
 
-                ydl_opts = {
-                    'writethumbnail': True,
-                    'format': 'bestaudio/best',
-                    'outtmpl': '/var/www/daisy/ytdl/{0}/%(title)s.%(ext)s'.format(sub_directory),
-                    'postprocessors': [{
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        'preferredquality': '320',
-                    },
-                    {'key': 'EmbedThumbnail'},
-                    {'key': 'FFmpegMetadata'},],
-                }
-
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    ydl.extract_info(message.text, download=True) 
-
-                    if os.path.exists('/var/www/daisy/ytdl/{0}/'.format(sub_directory)):
-                        for root, dirs, files in os.walk(os.path.abspath('/var/www/daisy/ytdl/{0}/'.format(sub_directory))):
-                            for file in files:
-                                total_size = os.path.getsize('/var/www/daisy/ytdl/{0}/{1}'.format(sub_directory,file))
-                                if total_size < 50000000:
-                                    file_encoded = urllib.parse.quote('{0}'.format(file))
-                                    aud_message = FileMessage(media='https://daisy.eyaadh.net/ytdl/{0}/{1}'.format(sub_directory,file_encoded), size=total_size, file_name='{0}'.format(file))
-
-                                    viber.send_messages(viber_request.sender.id, [aud_message])
-                                else:
-                                    viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber is stupid! And it has limitations. (depressed) \nMax file size that can be shared is 50MB and the file we just downloaded is larger than that, well tell you a secret I could send you the same file on telegram - try our partner bot on telegram @megadlbot (eek)")])
-                                    shutil.rmtree('/var/www/daisy/ytdl/{0}/'.format(sub_directory))
-
+                        aud_message = FileMessage(media=media_link, size=file_size, file_name=file_name)
+                        viber.send_messages(viber_request.sender.id, [aud_message])
+                    else:
+                        viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber is stupid! And it has limitations. (depressed) \nMax file size that can be shared is 50MB and the file we just downloaded is larger than that, well tell you a secret I could send you the same file on telegram - try our partner bot on telegram @megadlbot (eek)")])                    
+                else:
+                    viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Link (eyeroll), Kindly resend me the command yt_audio and send me a proper YouTube link to convert it to Audio.", tracking_data=None)])
     
     if isinstance(viber_request, ViberConversationStartedRequest) :
         viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start to begin with.".format(viber_request.user.name))])
