@@ -54,7 +54,7 @@ class News:
         featured_list =  soup.find_all('div', class_='col-md-6 my-3 priority-news')
         for featured in featured_list:
             article = []
-            title = featured.find('h6').text
+            title = featured.find('h4').text
             link = featured.find('a').get('href')
             image = featured.find('img').get('src')
             article.extend((title, link, image))
@@ -119,4 +119,5 @@ raajje = News.raajje()
 vaguthu = News.vaguthu()
 mihaaru = News.mihaaru()
 
+#print(raajje)
 

@@ -10,12 +10,11 @@ from viberbot.api.viber_requests import ViberFailedRequest
 from viberbot.api.viber_requests import ViberMessageRequest
 from viberbot.api.viber_requests import ViberSubscribedRequest
 from viberbot.api.viber_requests import ViberUnsubscribedRequest
-from bs4 import BeautifulSoup
-from bs4 import SoupStrainer
 from urllib.request import Request, urlopen
 from utils.mvnews import News
 from utils.properties import Property
 from utils.ytdl import ytdl
+from utils.criminalcourt import getpdf
 
 import time
 import logging
@@ -70,7 +69,13 @@ def incoming():
                 mvnews_keyboard = Property.create_menu(menu_button_list)
 
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard)])
-            
+
+            elif re.match(command, "mvjobs", re.IGNORECASE):
+                menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv']]
+                mvjobs_keyboard = Property.create_menu(menu_button_list)
+
+                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard)])
+
             elif re.match(command, "sun.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from sun.mv:")])
                 sun_rich_media = Property.create_richmedia(News.sun())
@@ -90,6 +95,30 @@ def incoming():
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from mihaaru.mv:")])
                 mihaaru_rich_media = Property.create_richmedia(News.mihaaru())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= mihaaru_rich_media, min_api_version=6)])
+
+            elif re.match(command, "jobmaldives", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from job-maldives.com:")])
+                jobs_rich_media = Property.create_jobmv_rich_media()
+                viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= jobs_rich_media, min_api_version=6)])
+
+            elif re.match(command, "vazeefa.mv", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from vazeefa.mv:")])
+                vazeefa_rich_media = Property.create_vazeefa_rich_media()
+                viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vazeefa_rich_media, min_api_version=6)])
+
+            elif re.match(command, "gazette", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from gazette.mv:")])
+                gazette_rich_media = Property.create_gazette_rich_media()
+                viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= gazette_rich_media, min_api_version=6)])
+
+            elif re.match(command, "criminalcourt", re.IGNORECASE):
+                import urllib.request
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest schedule (time) available from criminlcourt.gov.mv")]) 
+                court_schedule = getpdf()
+                
+                pdf_message = FileMessage(media=court_schedule[1], size=court_schedule[0], file_name=court_schedule[2])
+                viber.send_messages(viber_request.sender.id, [pdf_message])
+
 
             elif re.match(command, "yt_audio", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the YouTube Link that you would like to convert to Audio", tracking_data="yt_audio")])
