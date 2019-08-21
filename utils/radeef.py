@@ -1,6 +1,7 @@
 #libraries
 import json
 import urllib
+import re
 class radeef:
     @staticmethod
     def radeef_english(search_term):
@@ -9,7 +10,7 @@ class radeef:
         return_data = []
         for dict in db:
             try:
-                if dict['English'] == search_term:
+                if re.match(search_term, dict['English'], re.IGNORECASE):
                     return_data.extend((dict['English'], dict['Latin'], dict['Definition'], dict['Dhivehi']))
             except:
                 pass
@@ -22,7 +23,7 @@ class radeef:
         return_data = []
         for dict in db:
             try:
-                if dict['Latin'] == search_term:
+                if re.match(search_term, dict['Latin'], re.IGNORECASE):
                     return_data.extend((dict['English'], dict['Latin'], dict['Definition'], dict['Dhivehi']))
             except:
                 pass
@@ -35,7 +36,7 @@ class radeef:
         return_data = []
         for dict in db:
             try:
-                if dict['Dhivehi'] == search_term:
+                if re.match(search_term, dict['Dhivehi'], re.IGNORECASE):
                     return_data.extend((dict['English'], dict['Latin'], dict['Definition'], dict['Dhivehi']))
             except:
                 pass

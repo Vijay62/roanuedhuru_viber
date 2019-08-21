@@ -68,7 +68,7 @@ def incoming():
             elif re.match(command, "mvjobs", re.IGNORECASE):
                 send_mvjobs_menu(viber_request.sender.id)
 
-            elif re.match(command, "radeef", re.IGNORECASE):
+            elif re.match(command, "radheef", re.IGNORECASE):
                 send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "sun.mv", re.IGNORECASE):
@@ -122,24 +122,22 @@ def incoming():
             
             elif re.match(command, "faithoora", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Publication Number of the Faithoora you would like to read. \n\nFor example send me a message with the number: 200\n\nI will reply you with the 200th Publication of Faithoora.\n\nCurrently I have details of 300 Faithoora Publications in my database.", tracking_data="faithoora")])
-                send_radeef_menu(viber_request.sender.id)
 
-            elif re.match(command, "en_radeef", re.IGNORECASE):
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the English Word that you would like to search in Radeef.", tracking_data="en_radeef")])
-                send_radeef_menu(viber_request.sender.id)
+            elif re.match(command, "en_radheef", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the English Word that you would like to search in Radheef.", tracking_data="en_radheef")])
 
-            elif re.match(command, "lt_radeef", re.IGNORECASE):
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Latin Word that you would like to search in Radeef.", tracking_data="lt_radeef")])
-                send_radeef_menu(viber_request.sender.id)
+            elif re.match(command, "lt_radheef", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Latin Word that you would like to search in radheef.", tracking_data="lt_radheef")])   
 
-            elif re.match(command, "dv_radeef", re.IGNORECASE):
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Dhivehi Word that you would like to search in Radeef.", tracking_data="dv_radeef")])
-                send_radeef_menu(viber_request.sender.id)
+            elif re.match(command, "dv_radheef", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Dhivehi Word that you would like to search in radheef.", tracking_data="dv_radheef")])
 
             elif re.match(command, "yt_audio", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the YouTube Link that you would like to convert to Audio", tracking_data="yt_audio")])
-                send_main_menu(viber_request.sender.id)
-        
+            
+            elif re.match(command, "help", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Here’s what I can currently do with the following commands (cool):\n\nMvNews: Fetch you the latest headlines from the news sources available.\n\nMvJobs: Fetch you the latest vacancy listings from the sources available.\n\nCriminalCourt: Send you a pdf timetable of the latest Criminal Court schedule.\n\nFaithoora: Send you a pdf file of any of the 300 Faithoora Publications I have in my db as per your request.\n\nRadheef: You send me a word I send you the meaning, for any word in the Radheef.\n\nYt_Audio: Convert your favorite Music, Podcasts or other Videos to a mp3 Audio file.\n\nMenu: Takes you to the Main Menu with all my commands.\n\nHelp: I will send you this same help message.")])
+
         if message.tracking_data == "yt_audio" and viber_request.sender.name is not "roanuedhuru":
             if token != last_token_track:
                 last_token_track = token
@@ -156,8 +154,10 @@ def incoming():
 
                         aud_message = FileMessage(media=media_link, size=file_size, file_name=file_name)
                         viber.send_messages(viber_request.sender.id, [aud_message])
+                        send_main_menu(viber_request.sender.id)
                     else:
                         viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber is stupid! And it has limitations. (depressed) \nMax file size that can be shared is 50MB and the file we just downloaded is larger than that, well tell you a secret I could send you the same file on telegram - try our partner bot on telegram @megadlbot (eek)")])                    
+                        send_main_menu(viber_request.sender.id)
                 else:
                     viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Link (eyeroll), Kindly resend me the command yt_audio and send me a proper YouTube link to convert it to Audio.", tracking_data=None)])
                 
@@ -171,8 +171,9 @@ def incoming():
                     viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Here is the {0}th Publication of Faithoora. (yo):".format(message.text), tracking_data=None)])
                     faithoora_message = FileMessage(media=faithoora_link, size=faithoora_size, file_name=file_name)
                     viber.send_messages(viber_request.sender.id, [faithoora_message])
+                    send_main_menu(viber_request.sender.id)
                 else:
-                    faithoora_link = "http://viber.eyaadh.net/download.php?file={0}".format(message.text)
+                    faithoora_link = "http://viber.baiva.ru/download.php?file={0}".format(message.text)
                     viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber has limitations. (depressed) \nMax file size that can be shared is 50MB and the publication I have is larger than that therefore I cannot send it as a pdf file however I have shared the link to download it.", tracking_data=None)])
 
                     faithoora_keyboard = {
@@ -220,35 +221,43 @@ def incoming():
 
             elif float(message.text) > 300:
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Publication Number (eyeroll), Kindly resend me the command faithoora and send me a proper Publication Number. I only have details of the first 300 Publications", tracking_data=None)])
+                send_main_menu(viber_request.sender.id)
             else:
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Publication Number (eyeroll), Kindly resend me the command faithoora and send me a proper Publication Number(only numerical values are accepted).", tracking_data=None)])
+                send_main_menu(viber_request.sender.id)
 
-        elif message.tracking_data == "en_radeef" and viber_request.sender.name is not "roanuedhuru":
+        elif message.tracking_data == "en_radheef" and viber_request.sender.name is not "roanuedhuru":
             data_obj = radeef.radeef_english(message.text)
             if not data_obj:
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radeef.", tracking_data=None)])
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radheef.", tracking_data=None)])
+                send_radeef_menu(viber_request.sender.id)
             else:
                 data_message = "Dhivehi: {0}\nDefinition: {1}\nLatin: {2}\nEnglish:{3}".format(data_obj[3], data_obj[2], data_obj[1], data_obj[0])
                 viber.send_messages(viber_request.sender.id, [TextMessage(text=data_message, tracking_data=None)])
+                send_radeef_menu(viber_request.sender.id)
 
-        elif message.tracking_data == "lt_radeef" and viber_request.sender.name is not "roanuedhuru":
+        elif message.tracking_data == "lt_radheef" and viber_request.sender.name is not "roanuedhuru":
             data_obj = radeef.radeef_latin(message.text)
             if not data_obj:
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radeef.", tracking_data=None)])
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radheef.", tracking_data=None)])
+                send_radheef_menu(viber_request.sender.id)
             else:
                 data_message = "Dhivehi: {0}\nDefinition: {1}\nLatin: {2}\nEnglish:{3}".format(data_obj[3], data_obj[2], data_obj[1], data_obj[0])
                 viber.send_messages(viber_request.sender.id, [TextMessage(text=data_message, tracking_data=None)])
+                send_radeef_menu(viber_request.sender.id)
         
-        elif message.tracking_data == "dv_radeef" and viber_request.sender.name is not "roanuedhuru":
+        elif message.tracking_data == "dv_radheef" and viber_request.sender.name is not "roanuedhuru":
             data_obj = radeef.radeef_dhivehi(message.text)
             if not data_obj:
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radeef.", tracking_data=None)])
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="I am sorry (sad), I could not find that word in Radheef.", tracking_data=None)])
+                send_radeef_menu(viber_request.sender.id)
             else:
                 data_message = "Dhivehi: {0}\nDefinition: {1}\nLatin: {2}\nEnglish:{3}".format(data_obj[3], data_obj[2], data_obj[1], data_obj[0])
                 viber.send_messages(viber_request.sender.id, [TextMessage(text=data_message, tracking_data=None)])
+                send_radeef_menu(viber_request.sender.id)
 
     if isinstance(viber_request, ViberConversationStartedRequest) :
-        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the same Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start or Menu to begin with.".format(viber_request.user.name))])
+        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, nice to meet you! (smiley) \nMyself Ronuedhuru - a project by Baivaru. I can do a lot of things for you such as fetching the News, Job Announcements, Radheef, Download Audio from YouTube and many more. \n\nSend “menu” or “start” to begin.".format(viber_request.user.name))])
 
     elif isinstance(viber_request, ViberFailedRequest):
         logger.warn("client failed receiving message. failure: {0}".format(viber_request))
@@ -259,12 +268,12 @@ def create_webhook(viber, webhookURL):
     viber.set_webhook("https://daisy.eyaadh.net:3408")
 
 def send_main_menu(user):
-    menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminalcourt.gov.mv Schedule'],['faithoora','Faithoora Publications'],['radeef','Radeef'],['yt_audio','Youtube to Audio']]
+    menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminal Court Schedule'],['faithoora','Faithoora Publications'],['radheef','Radheef'],['yt_audio','Youtube to Audio'],['help','Help']]
     default_keyboard = Property.create_menu(menu_button_list)
     viber.send_messages(user, [KeyboardMessage(keyboard= default_keyboard, min_api_version=6)])
 
 def send_mvnews_menu(user):
-    menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
+    menu_button_list = [['sun.mv','Sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
     mvnews_keyboard = Property.create_menu(menu_button_list)
     viber.send_messages(user, [KeyboardMessage(keyboard= mvnews_keyboard, min_api_version=6)])
 
@@ -274,7 +283,7 @@ def send_mvjobs_menu(user):
     viber.send_messages(user, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
 
 def send_radeef_menu(user):
-    menu_button_list = [['dv_radeef','Search in Dhivehi'],['lt_radeef','Search in Latin'],['en_radeef','Search in English'],['start','Back']]
+    menu_button_list = [['dv_radheef','Search in Dhivehi'],['lt_radheef','Search in Latin'],['en_radheef','Search in English'],['start','Back']]
     mvjobs_keyboard = Property.create_menu(menu_button_list)
     viber.send_messages(user, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
 
