@@ -61,19 +61,16 @@ def incoming():
             if re.match(command, "start", re.IGNORECASE) or re.match(command, "menu", re.IGNORECASE):
                 menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminalcourt.gov.mv Schedule'],['faithoora','Faithoora Publications'],['yt_audio','Youtube to Audio']]
                 default_keyboard = Property.create_menu(menu_button_list)
-
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard, min_api_version=6)])
                 
             elif re.match(command, "mvnews", re.IGNORECASE):
                 menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
                 mvnews_keyboard = Property.create_menu(menu_button_list)
-
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard, min_api_version=6)])
 
             elif re.match(command, "mvjobs", re.IGNORECASE):
                 menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv'],['start','Back']]
                 mvjobs_keyboard = Property.create_menu(menu_button_list)
-
                 viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
 
             elif re.match(command, "sun.mv", re.IGNORECASE):
@@ -146,14 +143,60 @@ def incoming():
                 
         elif message.tracking_data == "faithoora" and viber_request.sender.name is not "roanuedhuru":
             if (message.text).isdigit() and float(message.text) <= 300:
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Here is the {0}th Publication of Faithoora. (yo):".format(message.text), tracking_data=None)])
                 faithoora_link = "http://viber.eyaadh.net/faithoora/pdf/{0}.pdf".format(message.text)
                 faithoora_size = os.path.getsize("/var/www/html/faithoora/pdf/{0}.pdf".format(message.text))
                 file_name = "{0}.pdf".format(message.text)
                 
                 if faithoora_size < 50000000:
+                    viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Here is the {0}th Publication of Faithoora. (yo):".format(message.text), tracking_data=None)])
                     faithoora_message = FileMessage(media=faithoora_link, size=faithoora_size, file_name=file_name)
                     viber.send_messages(viber_request.sender.id, [faithoora_message])
+                else:
+                    faithoora_link = "http://radheef.mv/faithoora/{0}.pdf".format(message.text)
+                    viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber has limitations. (depressed) \nMax file size that can be shared is 50MB and the publication I have is larger than that therefore I cannot send it as a pdf file however I have shared the link to download it.", tracking_data=None)])
+
+                    faithoora_keyboard = {
+                        "Type":"keyboard",
+                        "DefaultHeight":True,
+                        "Buttons": [
+                            {
+                                "Columns": 6,
+                                "Rows": 1,
+                                "BgColor": "#FFFAFA",
+                                "ActionType": "open-url",
+                                "ActionBody":faithoora_link,
+                                "Text":"<font color='#000000'><b>Download Faithoora Publication: {0}</b></font>".format(file_name),
+                                "TextVAlign": "middle",
+                                "TextHAlign": "center",
+                                "TextOpacity": 90,
+                                "TextSize":"regular",
+                                "Frame": {
+                                    "BorderWidth" : 2,
+                                    "BorderColor" : "#708090",
+                                    "CornerRadius" : 4
+                                }
+                            },
+                            {
+                                "Columns": 6,
+                                "Rows": 1,
+                                "BgColor": "#FFFAFA",
+                                "ActionType": None,
+                                "ActionBody": "menu",
+                                "Text":"<font color='#000000'><b>Back</b></font>",
+                                "TextVAlign": "middle",
+                                "TextHAlign": "center",
+                                "TextOpacity": 90,
+                                "TextSize":"regular",
+                                "Frame": {
+                                    "BorderWidth" : 2,
+                                    "BorderColor" : "#708090",
+                                    "CornerRadius" : 4
+                                }
+                            }
+                        ]
+                    }
+
+                    viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= faithoora_keyboard, min_api_version=6)])
 
             elif float(message.text) > 300:
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Publication Number (eyeroll), Kindly resend me the command faithoora and send me a proper Publication Number. I only have details of the first 300 Publications", tracking_data=None)])
