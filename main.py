@@ -60,80 +60,85 @@ def incoming():
             last_token = token
             
             if re.match(command, "start", re.IGNORECASE) or re.match(command, "menu", re.IGNORECASE):
-                menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminalcourt.gov.mv Schedule'],['faithoora','Faithoora Publications'],['radeef','Radeef'],['yt_audio','Youtube to Audio']]
-                default_keyboard = Property.create_menu(menu_button_list)
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard, min_api_version=6)])
+                send_main_menu(viber_request.sender.id)
                 
             elif re.match(command, "mvnews", re.IGNORECASE):
-                menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
-                mvnews_keyboard = Property.create_menu(menu_button_list)
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard, min_api_version=6)])
+                send_mvnews_menu(viber_request.sender.id)
 
             elif re.match(command, "mvjobs", re.IGNORECASE):
-                menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv'],['start','Back']]
-                mvjobs_keyboard = Property.create_menu(menu_button_list)
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
+                send_mvjobs_menu(viber_request.sender.id)
 
             elif re.match(command, "radeef", re.IGNORECASE):
-                menu_button_list = [['dv_radeef','Search in Dhivehi'],['lt_radeef','Search in Latin'],['en_radeef','Search in English'],['start','Back']]
-                mvjobs_keyboard = Property.create_menu(menu_button_list)
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
+                send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "sun.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from sun.mv:")])
                 sun_rich_media = Property.create_richmedia(News.sun())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= sun_rich_media, min_api_version=6)])
+                send_mvnews_menu(viber_request.sender.id)
             
             elif re.match(command, "rajje.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from rajje.mv:")])
                 rajje_rich_media = Property.create_richmedia(News.raajje())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= rajje_rich_media, min_api_version=6)])
+                send_mvnews_menu(viber_request.sender.id)
 
             elif re.match(command, "vaguthu.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from vaguthu.mv:")])
                 vaguthu_rich_media = Property.create_richmedia(News.vaguthu())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vaguthu_rich_media, min_api_version=6)])
+                send_mvnews_menu(viber_request.sender.id)
   
             elif re.match(command, "mihaaru.com", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from mihaaru.mv:")])
                 mihaaru_rich_media = Property.create_richmedia(News.mihaaru())
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= mihaaru_rich_media, min_api_version=6)])
+                send_mvnews_menu(viber_request.sender.id)
 
             elif re.match(command, "jobmaldives", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from job-maldives.com:")])
                 jobs_rich_media = Property.create_jobmv_rich_media()
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= jobs_rich_media, min_api_version=6)])
+                send_mvjobs_menu(viber_request.sender.id)
 
             elif re.match(command, "vazeefa.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from vazeefa.mv:")])
                 vazeefa_rich_media = Property.create_vazeefa_rich_media()
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= vazeefa_rich_media, min_api_version=6)])
+                send_mvjobs_menu(viber_request.sender.id)
 
             elif re.match(command, "gazette", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest listings (paperclip) from gazette.mv:")])
                 gazette_rich_media = Property.create_gazette_rich_media()
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= gazette_rich_media, min_api_version=6)])
+                send_mvjobs_menu(viber_request.sender.id)
 
             elif re.match(command, "criminalcourt", re.IGNORECASE):
                 court_schedule = getpdf()
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest schedule (time) available from criminlcourt.gov.mv - [{0}]:".format(court_schedule[0]))]) 
                 pdf_message = FileMessage(media=court_schedule[1], size=court_schedule[2], file_name=court_schedule[3])
                 viber.send_messages(viber_request.sender.id, [pdf_message])
+                send_main_menu(viber_request.sender.id)
             
             elif re.match(command, "faithoora", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Publication Number of the Faithoora you would like to read. \n\nFor example send me a message with the number: 200\n\nI will reply you with the 200th Publication of Faithoora.\n\nCurrently I have details of 300 Faithoora Publications in my database.", tracking_data="faithoora")])
+                send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "en_radeef", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the English Word that you would like to search in Radeef.", tracking_data="en_radeef")])
+                send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "lt_radeef", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Latin Word that you would like to search in Radeef.", tracking_data="lt_radeef")])
+                send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "dv_radeef", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Dhivehi Word that you would like to search in Radeef.", tracking_data="dv_radeef")])
+                send_radeef_menu(viber_request.sender.id)
 
             elif re.match(command, "yt_audio", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the YouTube Link that you would like to convert to Audio", tracking_data="yt_audio")])
+                send_main_menu(viber_request.sender.id)
         
         if message.tracking_data == "yt_audio" and viber_request.sender.name is not "roanuedhuru":
             if token != last_token_track:
@@ -243,7 +248,7 @@ def incoming():
                 viber.send_messages(viber_request.sender.id, [TextMessage(text=data_message, tracking_data=None)])
 
     if isinstance(viber_request, ViberConversationStartedRequest) :
-        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start or Menu to begin with.".format(viber_request.user.name))])
+        viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the same Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start or Menu to begin with.".format(viber_request.user.name))])
 
     elif isinstance(viber_request, ViberFailedRequest):
         logger.warn("client failed receiving message. failure: {0}".format(viber_request))
@@ -252,6 +257,26 @@ def incoming():
 
 def create_webhook(viber, webhookURL):
     viber.set_webhook("https://daisy.eyaadh.net:3408")
+
+def send_main_menu(user):
+    menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminalcourt.gov.mv Schedule'],['faithoora','Faithoora Publications'],['radeef','Radeef'],['yt_audio','Youtube to Audio']]
+    default_keyboard = Property.create_menu(menu_button_list)
+    viber.send_messages(user, [KeyboardMessage(keyboard= default_keyboard, min_api_version=6)])
+
+def send_mvnews_menu(user):
+    menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
+    mvnews_keyboard = Property.create_menu(menu_button_list)
+    viber.send_messages(user, [KeyboardMessage(keyboard= mvnews_keyboard, min_api_version=6)])
+
+def send_mvjobs_menu(user):
+    menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv'],['start','Back']]
+    mvjobs_keyboard = Property.create_menu(menu_button_list)
+    viber.send_messages(user, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
+
+def send_radeef_menu(user):
+    menu_button_list = [['dv_radeef','Search in Dhivehi'],['lt_radeef','Search in Latin'],['en_radeef','Search in English'],['start','Back']]
+    mvjobs_keyboard = Property.create_menu(menu_button_list)
+    viber.send_messages(user, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
 
 
 if __name__ == "__main__":    
