@@ -3,10 +3,9 @@
 from bs4 import BeautifulSoup
 from bs4 import SoupStrainer
 from urllib.request import Request, urlopen
-from urllib.parse import quote
+from urllib.parse import unquote
+from functools import reduce
 import os
-import binascii
-import subprocess
 
 def getpdf():
     req = Request('http://criminalcourt.gov.mv/%de%86%de%af%de%93%de%b0-%de%9d%de%ac%de%91%de%a8%de%87%de%aa%de%8d%de%b0/', headers={'User-Agent': 'Mozilla/5.0'})
@@ -14,30 +13,22 @@ def getpdf():
     divs = SoupStrainer('div', class_= 'aec aec-events aec-table-layout')
     soup = BeautifulSoup(sun, 'lxml', parse_only=divs)
 
-    latest = soup.find_all('div',class_='row aec-table-layout-row')
-    link = latest[0].find('a').get('href')
-
-    #return link
-    criminal_dl_data = []
-    sub_directory=binascii.b2a_hex(os.urandom(4)).decode('utf-8')
-    os.mkdir('/var/www/daisy/ytdl/{0}/'.format(sub_directory))
+    latest_schedule = soup.find('p', class_='aec-margin-top')
     
-    dl_args=['aria2c', '-q', '--dir', '/var/www/daisy/ytdl/{0}/'.format(sub_directory), link]
-    download_processor = subprocess.Popen(dl_args)
-    while True:
-        poll = download_processor.poll()
-        if poll == 0:
-            if os.path.exists('/var/www/daisy/ytdl/{0}/'.format(sub_directory)):
-                for root, dirs, files in os.walk(os.path.abspath('/var/www/daisy/ytdl/{0}/'.format(sub_directory))):
-                    for file in files:
-                        total_size = os.path.getsize('/var/www/daisy/ytdl/{0}/{1}'.format(sub_directory,file))
-                        file_encoded = quote('{0}'.format(file))
-                        media_link = 'https://daisy.eyaadh.net/ytdl/{0}/{1}'.format(sub_directory,file_encoded)
-                        file_name = '{0}'.format(file)
-                        criminal_dl_data.extend((total_size, media_link, file_name))
-                        return criminal_dl_data
-            break
-
+    criminalcourt = [] 
+    title = soup.find('h3',class_='aec-no-margin').text
+    pdf_url = reduce(lambda a, b: a.replace(*b),
+                    [('[pdfjs-viewer url="',''), ('" viewer_width=100% viewer_height=1360px fullscreen=true download=true print=true]','')],
+                    latest_schedule.text
+                )
+    pdf_url = unquote(pdf_url)
+    pdf = urlopen(pdf_url)
+    meta = pdf.info()
+    size = meta.get('Content-Length')
+    file_name = os.path.basename(pdf_url)
+    
+    criminalcourt.extend((title, pdf_url, size, file_name))
+    return criminalcourt
 
 pdf = getpdf()
 #print(pdf)

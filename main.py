@@ -22,7 +22,7 @@ import sched
 import threading
 import tldextract
 import re
-
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -59,22 +59,22 @@ def incoming():
             last_token = token
             
             if re.match(command, "start", re.IGNORECASE) or re.match(command, "menu", re.IGNORECASE):
-                menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcments'],['yt_audio','Youtube to Audio']]
+                menu_button_list = [['mvnews','News Headlines'],['mvjobs','Job Announcements'],['criminalcourt','Criminalcourt.gov.mv Schedule'],['faithoora','Faithoora Publications'],['yt_audio','Youtube to Audio']]
                 default_keyboard = Property.create_menu(menu_button_list)
 
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard)])
+                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= default_keyboard, min_api_version=6)])
                 
             elif re.match(command, "mvnews", re.IGNORECASE):
                 menu_button_list = [['sun.mv','sun.mv'],['rajje.mv','Rajje.mv'],['vaguthu.mv','Vaguthu.mv'],['mihaaru.com','Mihaaru.com'],['start','Back']]
                 mvnews_keyboard = Property.create_menu(menu_button_list)
 
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard)])
+                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvnews_keyboard, min_api_version=6)])
 
             elif re.match(command, "mvjobs", re.IGNORECASE):
-                menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv']]
+                menu_button_list = [['jobmaldives','job-maldives.com'],['vazeefa.mv','vazeefa.mv'],['gazette','gazette.mv'],['start','Back']]
                 mvjobs_keyboard = Property.create_menu(menu_button_list)
 
-                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard)])
+                viber.send_messages(viber_request.sender.id, [KeyboardMessage(keyboard= mvjobs_keyboard, min_api_version=6)])
 
             elif re.match(command, "sun.mv", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest headlines (book) from sun.mv:")])
@@ -112,13 +112,13 @@ def incoming():
                 viber.send_messages(viber_request.sender.id, [RichMediaMessage(rich_media= gazette_rich_media, min_api_version=6)])
 
             elif re.match(command, "criminalcourt", re.IGNORECASE):
-                import urllib.request
-                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest schedule (time) available from criminlcourt.gov.mv")]) 
                 court_schedule = getpdf()
-                
-                pdf_message = FileMessage(media=court_schedule[1], size=court_schedule[0], file_name=court_schedule[2])
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Latest schedule (time) available from criminlcourt.gov.mv - [{0}]:".format(court_schedule[0]))]) 
+                pdf_message = FileMessage(media=court_schedule[1], size=court_schedule[2], file_name=court_schedule[3])
                 viber.send_messages(viber_request.sender.id, [pdf_message])
-
+            
+            elif re.match(command, "faithoora", re.IGNORECASE):
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the Publication Number of the Faithoora you would like to read. \n\nFor example send me a message with the number: 200\n\nI will reply you with the 200th Publication of Faithoora.\n\nCurrently I have details of 300 Faithoora Publications in my database.", tracking_data="faithoora")])
 
             elif re.match(command, "yt_audio", re.IGNORECASE):
                 viber.send_messages(viber_request.sender.id, [TextMessage(text="Kindly send me the YouTube Link that you would like to convert to Audio", tracking_data="yt_audio")])
@@ -143,6 +143,23 @@ def incoming():
                         viber.send_messages(viber_request.sender.id, [TextMessage(text="Well Viber is stupid! And it has limitations. (depressed) \nMax file size that can be shared is 50MB and the file we just downloaded is larger than that, well tell you a secret I could send you the same file on telegram - try our partner bot on telegram @megadlbot (eek)")])                    
                 else:
                     viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Link (eyeroll), Kindly resend me the command yt_audio and send me a proper YouTube link to convert it to Audio.", tracking_data=None)])
+                
+        elif message.tracking_data == "faithoora" and viber_request.sender.name is not "roanuedhuru":
+            if (message.text).isdigit() and float(message.text) <= 300:
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Ok! Here is the {0}th Publication of Faithoora. (yo):".format(message.text), tracking_data=None)])
+                faithoora_link = "http://viber.eyaadh.net/faithoora/pdf/{0}.pdf".format(message.text)
+                faithoora_size = os.path.getsize("/var/www/html/faithoora/pdf/{0}.pdf".format(message.text))
+                file_name = "{0}.pdf".format(message.text)
+                
+                if faithoora_size < 50000000:
+                    faithoora_message = FileMessage(media=faithoora_link, size=faithoora_size, file_name=file_name)
+                    viber.send_messages(viber_request.sender.id, [faithoora_message])
+
+            elif float(message.text) > 300:
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Publication Number (eyeroll), Kindly resend me the command faithoora and send me a proper Publication Number. I only have details of the first 300 Publications", tracking_data=None)])
+            else:
+                viber.send_messages(viber_request.sender.id, [TextMessage(text="Invalid Publication Number (eyeroll), Kindly resend me the command faithoora and send me a proper Publication Number(only numerical values are accepted).", tracking_data=None)])
+
     
     if isinstance(viber_request, ViberConversationStartedRequest) :
         viber.send_messages(viber_request.user.id, [TextMessage(text="Hello {0}, \nI came to life from telegram. I am the Raonueudhuru_bot from Telegarm and the same family who developed the telegram bot develop me on viber, currently I am at my beta source however we will be there in no time. \n\nSend me Start or Menu to begin with.".format(viber_request.user.name))])

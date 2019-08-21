@@ -20,10 +20,10 @@ class Property:
                         {
                             "Columns": 6,
                             "Rows": 1,
-                            "BgColor": "#708090",
+                            "BgColor": "#FFFAFA",
                             "ActionType":"open-url",
                             "ActionBody": article[1],
-                            "Text":"<font color='#ffffff'><b><i>{0}...</i></b></font>".format(article[0][0:80]),
+                            "Text":"<font color='#000000'><b><i>{0}...</i></b></font>".format(article[0][0:80]),
                             "TextVAlign": "middle",
                             "TextHAlign": "center",
                             "TextOpacity": 100,
@@ -34,7 +34,7 @@ class Property:
 
         new_rich_media = {
             "Type": "rich_media",
-            "BgColor": "#DCDCDC",
+            "BgColor": "#FFFAFA",
             "ButtonsGroupColumns":6,
             "ButtonsGroupRows":7,
             "Buttons": news_buttons,                    
@@ -50,14 +50,19 @@ class Property:
                 {
                     "Columns": 6,
                     "Rows": 1,
-                    "BgColor": "#778899",
+                    "BgColor": "#FFFAFA",
                     "ActionType": None,
                     "ActionBody":button[0],
-                    "Text":"<font color='#ffffff'><b>{0}</b></font>".format(button[1]),
+                    "Text":"<font color='#000000'><b>{0}</b></font>".format(button[1]),
                     "TextVAlign": "middle",
                     "TextHAlign": "center",
                     "TextOpacity": 90,
-                    "TextSize":"regular"
+                    "TextSize":"regular",
+                    "Frame": {
+                        "BorderWidth" : 2,
+                        "BorderColor" : "#708090",
+                        "CornerRadius" : 4
+                    }
                 }
             )
         menu = {
